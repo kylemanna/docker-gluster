@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Is this necessary?
+#service rpcbind start
+
+# Run in background
+glusterd --no-daemon --log-file=/dev/stdout &
+
+sleep 1
+
+if [ ! -d "/mnt/vault/myvolume/.glusterfs" ]; then
+    mkdir -p /mnt/vault
+    # Force to avoid issues with complaints about rootfs
+    gluster volume create myvolume $(hostname -i):/mnt/vault/myvolume force
+fi
+
+gluster volume start myvolume
+
+# Bring glusterd background task in to foreground and block
+wait
